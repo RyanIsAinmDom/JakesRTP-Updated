@@ -22,7 +22,7 @@ dependencies {
     compileOnly 'us.dynmap:dynmap-api:3.1'
     compileOnly 'org.popcraft:chunky-common:1.2.86'
     compileOnly 'org.popcraft:chunkyborder-common:1.0.59'
-    compileOnly 'org.popcraft:chunkyborder-bukkit:1.0.59'
+    compileOnly 'org.popcraft:chunkyborder-bukkit:1.1.45'
     compileOnly 'com.github.Brettflan:WorldBorder:c0d1772418'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
     compileOnly 'com.github.TechFortress:GriefPrevention:16.17.1'
