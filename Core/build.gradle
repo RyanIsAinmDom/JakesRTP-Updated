@@ -10,14 +10,17 @@ repositories {
     maven { url 'https://jitpack.io' }
     maven { url 'https://maven.enginehub.org/repo/' }
     maven { url 'https://repo.mikeprimm.com/'}
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT'
     implementation 'io.papermc:paperlib:1.0.8'
-    implementation 'biz.donvi:ArgsChecker:1.0'
-    implementation 'biz.donvi:EvenDistribution:1.1.1'
-    implementation 'biz.donvi:GnuPlotter:1.2'
+    implementation files('libs/ArgsChecker.jar')
+    implementation files('libs/EvenDistribution.jar')
+    implementation files('libs/GnuPlotter.jar')
 //    implementation project(":patch-1-12-2")
     compileOnly 'us.dynmap:dynmap-api:3.1'
     compileOnly 'org.popcraft:chunky-common:1.3.67'
@@ -50,7 +53,7 @@ artifacts {
 
 task copyToMainOut(type: Copy) {
     dependsOn(tasks.build)
-    delete file("../build-output-final/").listFiles()
+    file("../build-output-final/").listFiles()?.each { it.delete() }
     from file("build/libs/Core-${project.version}-all.jar")
     into file("../build-output-final")
     rename 'Core-', 'JakesRTP-v'
