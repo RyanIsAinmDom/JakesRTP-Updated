@@ -364,8 +364,9 @@ public class RandomTeleporter {
         if (queueEnabled && takeFromQueue && rtpProfile.canUseLocQueue) {
             Location preselectedLocation = rtpProfile.locationQueue.poll();
             if (preselectedLocation != null) {
+                Bukkit.getScheduler().runTask(plugin, () -> preselectedLocation.getChunk().load());
                 plugin.getServer().getScheduler() // Tell queue to refill soon
-                      .runTaskLaterAsynchronously(plugin, () -> locFinderRunnable.syncNotify(), 100);
+                      .runTaskLater(plugin, () -> locFinderRunnable.syncNotify(), 100);
                 return preselectedLocation;
             }
         }
@@ -392,7 +393,7 @@ public class RandomTeleporter {
             //   skip everything else. The reason for the verbosity is so that we can log *why* the check failed. The
             //   general flow of the if statement goes like this: "If the location still looks safe, run this next
             //   check, and if it fails, mark the location as unsafe". Each of these if blocks MUST contain the
-            //   `locationBad = temp` assignment because EVERY time we make it inside, the safty state of the location
+            //   `locationBad = temp` assignment because EVERY time we make it inside, the safety state of the location
             //   has changed!
             locationBad = false;
             //noinspection ConstantConditions // It's for readability’s sake. Just let it be.

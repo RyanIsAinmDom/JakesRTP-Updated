@@ -6,10 +6,6 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-
 public class SafeLocationUtils {
 
     public static final SafeLocationUtils util;
@@ -232,15 +228,18 @@ public class SafeLocationUtils {
         // If our location was above the max height, drop us to it.
         if (loc.getY() > highBound) loc.setY(highBound);
         // If we start in a solid block, we need to wait until we get out of it
-        while (loc.getBlockY() > lowBound && !(
-            isSafeToBeIn(loc.getBlock().getType())
-            || isSafeToGoThrough(loc.getBlock().getType()))
-        ) loc.add(0, -1, 0);
-        // Now we are in something non-solid; we can start looking for the ground
-        while (loc.getBlockY() > lowBound && (
-            isSafeToBeIn(loc.getBlock().getType())
-            || isSafeToGoThrough(loc.getBlock().getType()))
-        ) loc.add(0, -1, 0);
+        Bukkit.getScheduler().runTask(JakesRtpPlugin.plugin, () -> {
+            loc.getChunk().load();
+            while (loc.getBlockY() > lowBound && !(
+                    isSafeToBeIn(loc.getBlock().getType())
+                            || isSafeToGoThrough(loc.getBlock().getType()))
+            ) loc.add(0, -1, 0);
+            // Now we are in something non-solid; we can start looking for the ground
+            while (loc.getBlockY() > lowBound && (
+                    isSafeToBeIn(loc.getBlock().getType())
+                            || isSafeToGoThrough(loc.getBlock().getType()))
+            ) loc.add(0, -1, 0);
+        });
     }
 
     /**

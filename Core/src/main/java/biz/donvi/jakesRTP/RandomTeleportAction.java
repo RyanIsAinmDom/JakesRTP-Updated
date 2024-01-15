@@ -12,6 +12,7 @@ import java.util.Objects;
 import static biz.donvi.jakesRTP.GeneralUtil.fillPlaceholders;
 import static biz.donvi.jakesRTP.GeneralUtil.locationAsString;
 import static biz.donvi.jakesRTP.JakesRtpPlugin.infoLog;
+import static biz.donvi.jakesRTP.JakesRtpPlugin.plugin;
 
 /**
  * Class used for interfacing with the random teleport functionality. This class was made majority for internal use,
@@ -108,7 +109,7 @@ public class RandomTeleportAction {
      */
     public RandomTeleportAction teleportAsync(Player player) throws JrtpBaseException {
         preTeleport(player);
-        PaperLib.teleportAsync(player, landingLoc).thenAccept(this::postTeleport);
+        PaperLib.teleportAsync(player, landingLoc).thenAcceptAsync(this::postTeleport);
         return this;
     }
 
@@ -211,9 +212,8 @@ public class RandomTeleportAction {
                 logMessage +
                 "Player did not teleport.");
         rtpCount++;
-        if (rtpProfile.commandsToRun.length != 0)
-            for (String command : rtpProfile.commandsToRun)
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), fillPlaceholders(command, placeholders));
+        for (String command : rtpProfile.commandsToRun)
+            Bukkit.getScheduler().runTask(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), fillPlaceholders(command, placeholders)));
     }
 
     static class RandomTeleportActionAlreadyUsedException extends RuntimeException {}
