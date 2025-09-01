@@ -8,6 +8,7 @@ api-version: '1.13'
 softdepend:
   # Needed for multi-world support
   - 'Multiverse-Core'
+  - 'My_Worlds'
   # Needed for economy support
   - 'Vault'
   # For world-border support
@@ -26,6 +27,7 @@ commands:
     description: 'Teleports you to a random location'
     aliases:
       - 'wild'
+      - 'wildtp'
     permission: 'jakesrtp.use'
     permission-message: 'Could not run command. Missing permission node: jakesrtp.use'
     usage: '/rtp'
@@ -46,7 +48,7 @@ permissions:
     default: true
   jakesrtp.usebyname:
     description: 'Allows players to give a rtpSettings name after rtp as such: "/rtp <settingsName>"'
-    default: false
+    default: op
   jakesrtp.rtpondeath:
     description: 'If rtp-on-death is enabled, players with this node will be respawn in a random location'
     default: false
