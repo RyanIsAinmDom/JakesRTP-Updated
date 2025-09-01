@@ -5,22 +5,24 @@ subprojects {
     apply plugin: 'maven-publish'
 
     group = 'biz.donvi'
-    project.version = '0.14.9'
+    version = '0.15.0'
 
-    sourceCompatibility = 17
-    targetCompatibility = 17
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-
     }
 
     repositories {
         mavenLocal()
-        maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+        maven { url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/') }
     }
 
-    tasks.withType(Copy).all {
-        duplicatesStrategy 'include'
+    tasks.withType(Copy).configureEach {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
+
 }
