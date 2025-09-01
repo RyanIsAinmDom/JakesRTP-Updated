@@ -1,16 +1,18 @@
 package biz.donvi.jakesRTP.claimsIntegrations;
 
-import me.angeschossen.lands.api.integration.LandsIntegration;
+import me.angeschossen.lands.api.LandsIntegration;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 
-public class LrLands implements LocationRestrictor{
-    protected Plugin lands;
-    protected final LandsIntegration landsIntegration;
-    public LrLands(Plugin plugin,Plugin rtpPlugin){
-        this.lands = plugin;
-        landsIntegration = new LandsIntegration(rtpPlugin);
+public class LrLands implements LocationRestrictor {
+    private final Plugin lands;
+    private final LandsIntegration api;
+
+    public LrLands(Plugin landsPlugin, Plugin rtpPlugin) {
+        this.lands = landsPlugin;
+        this.api = LandsIntegration.of(rtpPlugin);
     }
+
     @Override
     public Plugin supporterPlugin() {
         return lands;
@@ -18,6 +20,7 @@ public class LrLands implements LocationRestrictor{
 
     @Override
     public boolean denyLandingAtLocation(Location location) {
-        return landsIntegration.isClaimed(location);
+        // isClaimed(...) is deprecated/removed on the new API; check for an Area instead
+        return api.getUnloadedArea(location) != null;
     }
 }
