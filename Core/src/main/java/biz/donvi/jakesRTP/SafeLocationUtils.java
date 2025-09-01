@@ -5,31 +5,26 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public class SafeLocationUtils {
 
     public static final SafeLocationUtils util;
-
     private static final SafeLocationUtils_Patch patches;
 
     static {
         util = new SafeLocationUtils();
         Class<SafeLocationUtils_Patch> patchClass = null;
         SafeLocationUtils_Patch patchInstance = null;
-        try {
-            if (PaperLib.getMinecraftVersion() <= 12) {
-                //noinspection unchecked
-                patchClass = (Class<SafeLocationUtils_Patch>) Class
-                    .forName("biz.donvi.jakesRTP.SafeLocationUtils_12")
-                    .asSubclass(SafeLocationUtils_Patch.class);
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         if (patchClass != null)
             try {
-                patchInstance = patchClass.newInstance();
-            } catch (IllegalAccessException | InstantiationException e) {
+                Constructor<? extends SafeLocationUtils_Patch> ctor = patchClass.getDeclaredConstructor();
+                ctor.setAccessible(true);
+                patchInstance = ctor.newInstance();
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         else patchInstance = new SafeLocationUtils_Patch.BlankPatch();
@@ -50,17 +45,17 @@ public class SafeLocationUtils {
      * @return Whether it is safe or not to be there
      */
     boolean isSafeToBeIn(Material mat) {
-        if (patches.matchesPatchVersion(12)) return patches.isSafeToBeIn(mat);
         switch (mat) {
             case AIR:
             case SNOW:
             case FERN:
             case LARGE_FERN:
             case VINE:
-            case GRASS:
+            case SHORT_GRASS:
             case TALL_GRASS:
             case GLOW_LICHEN:
             case MOSS_CARPET:
+            case PALE_MOSS_CARPET:
             case GLOW_BERRIES:
             case PINK_PETALS:
                 return true;
@@ -80,7 +75,6 @@ public class SafeLocationUtils {
      * @return Whether it is safe or not to be there
      */
     boolean isSafeToBeOn(Material mat) {
-        if (patches.matchesPatchVersion(12)) return patches.isSafeToBeOn(mat);
         switch (mat) {
             case LAVA:
             case MAGMA_BLOCK:
@@ -115,22 +109,7 @@ public class SafeLocationUtils {
      * @return Whether it is a type of leaf
      */
     boolean isTreeLeaves(Material mat) {
-        if (patches.matchesPatchVersion(12)) return patches.isTreeLeaves(mat);
-        switch (mat) {
-            case ACACIA_LEAVES:
-            case BIRCH_LEAVES:
-            case DARK_OAK_LEAVES:
-            case JUNGLE_LEAVES:
-            case OAK_LEAVES:
-            case SPRUCE_LEAVES:
-            case AZALEA_LEAVES:
-            case FLOWERING_AZALEA_LEAVES:
-            case MANGROVE_LEAVES:
-            case CHERRY_LEAVES:
-                return true;
-            default:
-                return false;
-        }
+        return Tag.LEAVES.isTagged(mat);
     }
 
     /**
@@ -324,8 +303,6 @@ public class SafeLocationUtils {
     }
 
     Material chunkLocMatFromSnapshot(int inX, int y, int inZ, ChunkSnapshot chunk) {
-        if (patches.matchesPatchVersion(12))
-            return patches.chunkLocMatFromSnapshot(inX, y, inZ, chunk);
         return chunk.getBlockData(inX, y, inZ).getMaterial();
     }
 
