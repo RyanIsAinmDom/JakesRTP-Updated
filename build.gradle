@@ -5,7 +5,7 @@ subprojects {
     apply plugin: 'maven-publish'
 
     group = 'biz.donvi'
-    version = '15.0'
+    version = '1.0'
 
     java {
         sourceCompatibility = JavaVersion.VERSION_21
