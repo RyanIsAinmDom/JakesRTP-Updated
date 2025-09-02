@@ -26,7 +26,7 @@ public class LrHuskTowns implements LocationRestrictor {
             // On Bukkit, adapt org.bukkit.Location -> Position and check if claimed
             return api.isClaimAt(api.getPosition(location));
         }
-        // If somehow not on Bukkit API (shouldn't happen on Paper/Spigot), allow landing
+        // Should never happen but makes compiler happy and therefore me
         return false;
     }
 }
