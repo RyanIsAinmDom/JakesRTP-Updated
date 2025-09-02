@@ -7,8 +7,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
 
 public class SafeLocationUtils {
 
@@ -21,10 +23,10 @@ public class SafeLocationUtils {
         SafeLocationUtils_Patch patchInstance = null;
         if (patchClass != null)
             try {
-                Constructor<? extends SafeLocationUtils_Patch> ctor = patchClass.getDeclaredConstructor();
-                ctor.setAccessible(true);
-                patchInstance = ctor.newInstance();
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(patchClass, MethodHandles.lookup());
+                MethodHandle ctor = lookup.findConstructor(patchClass, MethodType.methodType(void.class));
+                patchInstance = (SafeLocationUtils_Patch) ctor.invoke();
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         else patchInstance = new SafeLocationUtils_Patch.BlankPatch();
