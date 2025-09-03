@@ -60,6 +60,7 @@ public class SafeLocationUtils {
             case PALE_MOSS_CARPET:
             case GLOW_BERRIES:
             case PINK_PETALS:
+            case LEAF_LITTER:
                 return true;
             case WATER:
             case LAVA:
