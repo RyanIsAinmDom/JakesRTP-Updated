@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-
 public class SafeLocationUtils {
 
     public static final SafeLocationUtils util;
@@ -33,7 +32,6 @@ public class SafeLocationUtils {
         patches = patchInstance;
     }
 
-
     private SafeLocationUtils() {}
 
     /* ================================================== *\
@@ -49,6 +47,7 @@ public class SafeLocationUtils {
     boolean isSafeToBeIn(Material mat) {
         switch (mat) {
             case AIR:
+            case CAVE_AIR:
             case SNOW:
             case FERN:
             case LARGE_FERN:
@@ -64,7 +63,7 @@ public class SafeLocationUtils {
                 return true;
             case WATER:
             case LAVA:
-            case CAVE_AIR:
+            case VOID_AIR:
             case POWDER_SNOW:
             default:
                 return false;
@@ -99,12 +98,13 @@ public class SafeLocationUtils {
                 return false;
             case GRASS_BLOCK:
             case STONE:
+            case DEEPSLATE:
             case DIRT:
             default:
                 return true;
         }
     }
-
+       
     /**
      * Checks if the given material is any type of tree leaf.
      *
