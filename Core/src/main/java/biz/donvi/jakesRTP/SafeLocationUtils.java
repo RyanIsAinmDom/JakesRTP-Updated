@@ -47,7 +47,6 @@ public class SafeLocationUtils {
     boolean isSafeToBeIn(Material mat) {
         switch (mat) {
             case AIR:
-            case CAVE_AIR:
             case SNOW:
             case FERN:
             case LARGE_FERN:
@@ -64,6 +63,7 @@ public class SafeLocationUtils {
             case WATER:
             case LAVA:
             case VOID_AIR:
+            case CAVE_AIR:
             case POWDER_SNOW:
             default:
                 return false;
@@ -97,9 +97,9 @@ public class SafeLocationUtils {
             case POINTED_DRIPSTONE:
                 return false;
             case GRASS_BLOCK:
+            case DIRT:
             case STONE:
             case DEEPSLATE:
-            case DIRT:
             default:
                 return true;
         }
