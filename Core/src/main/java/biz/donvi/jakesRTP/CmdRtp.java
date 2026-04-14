@@ -8,7 +8,6 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static biz.donvi.jakesRTP.JakesRtpPlugin.plugin;
@@ -26,8 +25,7 @@ public class CmdRtp implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         try {
-            if ((args.length == 0 || args.length == 1) && sender instanceof Player) {
-                Player player = (Player) sender;
+            if ((args.length == 0 || args.length == 1) && sender instanceof Player player) {
                 if (args.length == 1 && !sender.hasPermission("jakesrtp.usebyname"))
                     return false;
                 RtpProfile relSettings = args.length == 0
@@ -162,14 +160,10 @@ public class CmdRtp implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        ArrayList<String> validSearches = new ArrayList<>();
-        if (args.length == 0 ||
-            !(sender instanceof Player) ||
-            !sender.hasPermission("jakesrtp.usebyname")
-        ) return validSearches;
-        for (String name : randomTeleporter.getRtpSettingsNamesForPlayer((Player) sender))
-            if (name.contains(args[0]))
-                validSearches.add(name);
-        return validSearches;
+        if (args.length == 0 || !(sender instanceof Player player) || !sender.hasPermission("jakesrtp.usebyname"))
+            return List.of();
+        return randomTeleporter.getRtpSettingsNamesForPlayer(player).stream()
+            .filter(name -> name.contains(args[0]))
+            .toList();
     }
 }
