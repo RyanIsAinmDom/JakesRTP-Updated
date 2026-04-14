@@ -78,7 +78,7 @@ class MetricsCustomizer {
             if (cm == null) { // This feature is forcibly disabled
                 isUsed = false;
                 innerMap.put("Disabled", 1);
-            } else if (names.size() == 0) { // Not forcibly disabled, but no things are being used
+            } else if (names.isEmpty()) { // Not forcibly disabled, but no things are being used
                 isUsed = false;
                 innerMap.put("No supporting plugins found", 1);
             } else { // This means we have support ENABLED and there ARE loaded support things
