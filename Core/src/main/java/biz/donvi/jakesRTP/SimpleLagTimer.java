@@ -76,7 +76,7 @@ public class SimpleLagTimer {
                 tickInfoQueue.add(currentTick);
                 tickQueueTimeSum += currentTick.timeDif;
             }
-            while (tickInfoQueue.size() > 0 && System.currentTimeMillis() - tickInfoQueue.peek().timeOf > avgRange) {
+            while (!tickInfoQueue.isEmpty() && System.currentTimeMillis() - tickInfoQueue.peek().timeOf > avgRange) {
                 oldestTick = tickInfoQueue.poll();
                 tickQueueTimeSum -= oldestTick.timeDif;
             }
@@ -105,7 +105,7 @@ public class SimpleLagTimer {
      * @return The average tick time over the last {@code avgRange} milliseconds.
      */
     public float getAverageTick() {
-        return tickInfoQueue.size() == 0
+        return tickInfoQueue.isEmpty()
             ? Float.MAX_VALUE
             : (float) tickQueueTimeSum / tickInfoQueue.size();
     }
@@ -176,44 +176,18 @@ public class SimpleLagTimer {
 
     /**
      * Simple data storage object for tick time and duration.
+     * timeOf  = The time that the tick started (system time; milliseconds)
+     * timeDif = The length of the tick (in milliseconds)
+     * number  = The tick's number (where 0 is the first tick measured by the tick timer)
      */
-    private static class TickInfo {
-        /**
-         * The time that the tick started (system time; milliseconds)
-         */
-        final long timeOf;
-        /**
-         * The length of the tick (in milliseconds)
-         */
-        final long timeDif;
-        /**
-         * The ticks number (where 0 is the first tick measured by the tick timer)
-         */
-        final long number;
-
+    private record TickInfo(long timeOf, long timeDif, long number) {
         /**
          * Constructor for a tick that started at this instant (and thus can have no length yet)
          *
          * @param tickNum The number of the tick
          */
         TickInfo(long tickNum) {
-            timeOf = System.currentTimeMillis();
-            timeDif = -1;
-            number = tickNum;
-        }
-
-        /**
-         * Constructor for a tick after it has been measured.
-         *
-         * @param timeOf  The time the tick started (system time; ms)
-         * @param timeDif The length of the tick (in milliseconds)
-         * @param tickNum The number of the tick since the start of the tick timer
-         */
-        TickInfo(long timeOf, long timeDif, long tickNum) {
-            this.timeOf = timeOf;
-            this.timeDif = timeDif;
-            this.number = tickNum;
+            this(System.currentTimeMillis(), -1, tickNum);
         }
     }
 }
-
