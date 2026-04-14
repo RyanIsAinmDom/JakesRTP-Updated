@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static biz.donvi.jakesRTP.GeneralUtil.fillPlaceholders;
 import static biz.donvi.jakesRTP.GeneralUtil.locationAsString;
@@ -211,9 +212,12 @@ public class RandomTeleportAction {
             else infoLog(
                 logMessage +
                 "Player did not teleport.");
-        rtpCount++;
-        for (String command : rtpProfile.commandsToRun)
-            Bukkit.getScheduler().runTask(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), fillPlaceholders(command, placeholders)));
+        rtpCount.incrementAndGet();
+        if (rtpProfile.commandsToRun.length != 0)
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                for (String command : rtpProfile.commandsToRun)
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), fillPlaceholders(command, placeholders));
+        });
     }
 
     static class RandomTeleportActionAlreadyUsedException extends RuntimeException {}
@@ -222,15 +226,12 @@ public class RandomTeleportAction {
 
 
     // For metrics
-    private static int rtpCount = 0;
+    private static final AtomicInteger rtpCount = new AtomicInteger(0);
 
-    public static int getRtpCount() {return rtpCount;}
+    public static int getRtpCount() { return rtpCount.get(); }
 
-    public static void clearRtpCount() {rtpCount = 0;}
+    public static void clearRtpCount() { rtpCount.set(0); }
 
-    public static int getAndClearRtpCount(){
-        int count = rtpCount;
-        rtpCount = 0;
-        return count;
-    }
+    public static int getAndClearRtpCount() { return rtpCount.getAndSet(0); }
+    
 }
