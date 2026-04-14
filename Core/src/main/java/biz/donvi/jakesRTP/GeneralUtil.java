@@ -15,7 +15,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -59,10 +59,7 @@ public final class GeneralUtil {
      */
     public static String stringOf(char c, int times) {
         if (times <= 0) return "";
-        if (times == 1) return String.valueOf(c);
-        StringBuilder s = new StringBuilder();
-        for (int i = 0; i < times; i++) s.append(c);
-        return s.toString();
+        return String.valueOf(c).repeat(times);
     }
 
     /**
@@ -74,19 +71,16 @@ public final class GeneralUtil {
      * @return The proper name of the world if it exists, null if it doesn't.
      */
     public static String worldToProperCase(Server server, String worldName) {
-        final List<World> worldList = server.getWorlds();
-        for (World world : worldList)
-            if (world.getName().equalsIgnoreCase(worldName))
-                return world.getName();
-        return null;
+        return server.getWorlds().stream()
+            .filter(w -> w.getName().equalsIgnoreCase(worldName))
+            .map(World::getName)
+            .findFirst().orElse(null);
     }
 
     public static World getWorldIgnoreCase(Server server, String worldName) {
-        final List<World> worldList = server.getWorlds();
-        for (World world : worldList)
-            if (world.getName().equalsIgnoreCase(worldName))
-                return world;
-        return null;
+        return server.getWorlds().stream()
+            .filter(w -> w.getName().equalsIgnoreCase(worldName))
+            .findFirst().orElse(null);
     }
 
     /**
@@ -147,24 +141,21 @@ public final class GeneralUtil {
     }
 
     public static List<Pair<String, FileConfiguration>> getFileConfigFromFile(File[] files) {
-        List<Pair<String, FileConfiguration>> configs = new ArrayList<>();
-        for (File f : files)
-            configs.add(new Pair<String, FileConfiguration>(
+        return Arrays.stream(files)
+            .map(f -> new Pair<>(
                 f.getName().substring(0, f.getName().lastIndexOf(".")),
-                YamlConfiguration.loadConfiguration(f)
-            ));
-        return configs;
+                YamlConfiguration.loadConfiguration(f)))
+            .toList();
     }
 
     public static class Pair<K, V> {
-        public K key;
-        public V value;
+        public final K key;
+        public final V value;
 
         Pair(K key, V value) {
             this.key = key;
             this.value = value;
         }
-
     }
 
     /**
@@ -186,21 +177,7 @@ public final class GeneralUtil {
      * @return The items as comma separated list.
      */
     public static String listText(List<String> items) {
-        if (items == null || items.size() == 0) return null;
-        if (items.size() == 1) return items.get(0);
-        StringBuilder s = new StringBuilder(items.get(0));
-        for (int i = 1; i < items.size(); i++)
-            s.append(", ").append(items.get(i));
-        return s.toString();
-    }
-
-
-    public static long uselessLong = 0; // Quite literally useless. Never used anywhere.
-
-    public static String timeDifLog() { // Okay, that's a lie, it's used in this method.
-        long time = System.currentTimeMillis(); // But this method is not used anywhere.
-        long dif = time - uselessLong;
-        uselessLong = time;
-        return time + " " + dif;
+        if (items == null || items.isEmpty()) return null;
+        return String.join(", ", items);
     }
 }
