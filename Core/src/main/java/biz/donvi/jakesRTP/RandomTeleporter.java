@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import io.papermc.lib.PaperLib;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -177,11 +178,10 @@ public class RandomTeleporter {
      *
      * @return A list of RtpSettings names.
      */
-    public ArrayList<String> getRtpSettingsNames() {
-        ArrayList<String> rtpSettings = new ArrayList<>();
-        for (RtpProfile rtpSetting : this.rtpSettings)
-            rtpSettings.add(rtpSetting.name);
-        return rtpSettings;
+    public List<String> getRtpSettingsNames() {
+        return rtpSettings.stream()
+            .map(s -> s.name)
+            .toList();
     }
 
     /**
@@ -190,14 +190,13 @@ public class RandomTeleporter {
      * @param player The player to check for settings with.
      * @return All the names of rtpSettings that the given player can use.
      */
-    public ArrayList<String> getRtpSettingsNamesForPlayer(Player player) {
-        ArrayList<String> rtpSettings = new ArrayList<>();
-        for (RtpProfile rtpSetting : this.rtpSettings)
-            if (rtpSetting.commandEnabled && (
-                !rtpSetting.requireExplicitPermission ||
-                player.hasPermission(EXPLICIT_PERM_PREFIX + rtpSetting.name))
-            ) rtpSettings.add(rtpSetting.name);
-        return rtpSettings;
+    public List<String> getRtpSettingsNamesForPlayer(Player player) {
+        return rtpSettings.stream()
+            .filter(s -> s.commandEnabled && (
+                !s.requireExplicitPermission ||
+                player.hasPermission(EXPLICIT_PERM_PREFIX + s.name)))
+            .map(s -> s.name)
+            .toList();
     }
 
     /**
@@ -364,7 +363,7 @@ public class RandomTeleporter {
         if (queueEnabled && takeFromQueue && rtpProfile.canUseLocQueue) {
             Location preselectedLocation = rtpProfile.locationQueue.poll();
             if (preselectedLocation != null) {
-                Bukkit.getScheduler().runTask(plugin, () -> preselectedLocation.getChunk().load());
+                PaperLib.getChunkAtAsync(preselectedLocation);
                 plugin.getServer().getScheduler() // Tell queue to refill soon
                       .runTaskLater(plugin, () -> locFinderRunnable.syncNotify(), 100);
                 return preselectedLocation;
@@ -493,7 +492,7 @@ public class RandomTeleporter {
         } catch (JrtpBaseException.PluginDisabledException pluginDisabledException) {
             throw pluginDisabledException;
         } catch (Exception exception) {
-            if (exception instanceof JrtpBaseException) throw (JrtpBaseException) exception;
+            if (exception instanceof JrtpBaseException jrtp) throw jrtp;
             else exception.printStackTrace();
             return 0;
         }
