@@ -1,6 +1,6 @@
 package biz.donvi.jakesRTP;
 
-import org.bukkit.Bukkit;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -18,7 +18,7 @@ public class SafeLocationFinderBukkitThread extends SafeLocationFinder {
     @Override
     protected Material getLocMaterial(Location loc) {
         requireMainThread();
-        Bukkit.getScheduler().runTask(JakesRtpPlugin.plugin, () -> loc.getChunk().load());
+        PaperLib.getChunkAtAsync(loc);
         return loc.getBlock().getType();
     }
 
