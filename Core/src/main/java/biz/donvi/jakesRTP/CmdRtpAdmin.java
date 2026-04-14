@@ -8,13 +8,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class CmdRtpAdmin extends DynamicArgsMap implements TabExecutor {
 
-    Map<String, Object> cmdMap;
+    private final Map<String, Object> cmdMap;
 
     public CmdRtpAdmin(Map<String, Object> commandMap) {
         cmdMap = commandMap;
@@ -49,8 +48,7 @@ public class CmdRtpAdmin extends DynamicArgsMap implements TabExecutor {
     public void getPotential(String path) throws ResultAlreadySetException {
         //noinspection SwitchStatementWithTooFewBranches
         switch (path) {
-            case "status":
-                setResult(getConfigNames());
+            case "status" -> setResult(getConfigNames());
         }
     }
 
@@ -83,10 +81,10 @@ public class CmdRtpAdmin extends DynamicArgsMap implements TabExecutor {
      */
     private List<String> getConfigNames() {
         if (getConfigNamesResults == null || getConfigNamesResults.key < System.currentTimeMillis()) {
-            ArrayList<String> settingsNames = new ArrayList<>();
-            for (RtpProfile settings : JakesRtpPlugin.plugin.getRandomTeleporter().getRtpSettings()) {
-                settingsNames.add(settings.name);
-            }
+            List<String> settingsNames = JakesRtpPlugin.plugin.getRandomTeleporter().getRtpSettings()
+                .stream()
+                .map(s -> s.name)
+                .toList();
             getConfigNamesResults = new Pair<>(System.currentTimeMillis() + 1000, settingsNames);
         }
         return getConfigNamesResults.value;
