@@ -9,7 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,7 @@ import static org.bukkit.Bukkit.getServer;
 
 public class CmdForceRtp extends DynamicArgsMap implements TabExecutor {
 
-    Map<String, Object> cmdMap;
+    private final Map<String, Object> cmdMap;
 
     private final RandomTeleporter randomTeleporter;
 
@@ -97,27 +96,20 @@ public class CmdForceRtp extends DynamicArgsMap implements TabExecutor {
     @Override
     public void getPotential(String[] path) throws ResultAlreadySetException {
         if (path.length == 0) {
-            List<String> players = new ArrayList<>();
-            for (Player player : getServer().getOnlinePlayers())
-                players.add(player.getName());
-            setResult(players);
+            setResult(getServer().getOnlinePlayers().stream()
+                .map(Player::getName)
+                .toList());
         } else if (path.length == 2) {
             switch (path[1]) {
-                case "-c":
-                    setResult(randomTeleporter.getRtpSettingsNames());
-                    break;
-                case "-w":
-                    List<String> worldNames = new ArrayList<>();
-                    for (World world : getServer().getWorlds())
-                        worldNames.add(world.getName());
-                    setResult(worldNames);
-                    break;
+                case "-c" -> setResult(randomTeleporter.getRtpSettingsNames());
+                case "-w" -> setResult(getServer().getWorlds().stream()
+                    .map(World::getName)
+                    .toList());
             }
         }
     }
 
     @Override
     public void getPotential(String path) throws ResultAlreadySetException { }
-
 
 }
