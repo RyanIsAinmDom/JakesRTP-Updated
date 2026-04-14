@@ -45,9 +45,7 @@ shadowJar {
     relocate 'biz.donvi.evenDistribution', 'biz.donvi.jakesRTP.libs.biz.donvi.evenDistribution'
 }
 
-artifacts {
-    archives shadowJar
-}
+assemble.dependsOn shadowJar
 
 task copyToMainOut(type: Copy) {
     dependsOn(tasks.build)
