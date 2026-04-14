@@ -25,8 +25,8 @@ public class DistributionSettings {
             throw new JrtpBaseException.ConfigurationException("Configuration shape not properly defined.");
         }
         switch (shapeString) {
-            case "square" -> shape = new DistributionShape.Square(settings);
-            case "circle" -> shape = new DistributionShape.Circle(settings);
+            case "square" -> shape = new DistributionShape.Symmetric.Square(settings);
+            case "circle" -> shape = new DistributionShape.Symmetric.Circle(settings);
             case "rectangle" -> shape = new DistributionShape.Rectangle(settings);
             default -> throw new JrtpBaseException.ConfigurationException(
                 "Distribution shape not properly defined: " + shapeString);
