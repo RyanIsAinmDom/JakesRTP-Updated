@@ -1,6 +1,5 @@
 package biz.donvi.jakesRTP;
 
-import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -14,11 +13,11 @@ public class SafeLocationFinderBukkitThread extends SafeLocationFinder {
         final Location loc, int checkRadiusXZ, int checkRadiusVert,
         int lowBound, int highBound
     ) { super(loc, checkRadiusXZ, checkRadiusVert, lowBound, highBound); }
-
+    
     @Override
     protected Material getLocMaterial(Location loc) {
         requireMainThread();
-        PaperLib.getChunkAtAsync(loc);
+        loc.getChunk().load();        //Sync chunk load; this is a fallback method and should only be needed in extremely rare scenarios (if ever). Otherwise, chunk loading is always async.
         return loc.getBlock().getType();
     }
 
