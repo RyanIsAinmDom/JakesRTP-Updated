@@ -142,7 +142,7 @@ public final class GeneralUtil {
 
     public static List<Pair<String, FileConfiguration>> getFileConfigFromFile(File[] files) {
         return Arrays.stream(files)
-            .map(f -> new Pair<>(
+            .map(f -> new Pair<String, FileConfiguration>(
                 f.getName().substring(0, f.getName().lastIndexOf(".")),
                 YamlConfiguration.loadConfiguration(f)))
             .toList();
