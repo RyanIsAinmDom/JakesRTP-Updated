@@ -2,8 +2,8 @@ package biz.donvi.jakesRTP;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 import static biz.donvi.evenDistribution.RandomCords.*;
 import static biz.donvi.jakesRTP.MessageStyles.DebugDisplayLines.*;
@@ -45,10 +45,9 @@ abstract class DistributionShape {
             gaussianCenter = settings.getDouble("gaussian-distribution.center");
         }
 
-
         @Override
         public List<String> infoStrings(boolean mcFormat) {
-            ArrayList<String> list = new ArrayList<>();
+            List<String> list = new ArrayList<>();
             list.add(LVL_01_SET.format(mcFormat, "Distribution shape", shape()));
             list.add(DOU_01_SET.format(mcFormat, "Radius max", radiusMax, "Radius min", radiusMin));
             list.add(LVL_01_SET.format(mcFormat, "Gaussian Distribution", enabledOrDisabled(gaussianDistribution)));
@@ -58,49 +57,49 @@ abstract class DistributionShape {
             }
             return list;
         }
-    }
 
-    public static class Circle extends Symmetric {
-        public Circle(int rMax, int rMin) {super(rMax, rMin);}
+        public static class Circle extends Symmetric {
+            public Circle(int rMax, int rMin) {super(rMax, rMin);}
 
-        public Circle(ConfigurationSection settings) {super(settings);}
+            public Circle(ConfigurationSection settings) {super(settings);}
 
-        @Override
-        public String shape() {return "Circle";}
+            @Override
+            public String shape() {return "Circle";}
 
-        @Override
-        public int getArea() {
-            return (int) Math.floor(Math.PI * radiusMax * radiusMax - Math.PI * radiusMin * radiusMin);
+            @Override
+            public int getArea() {
+                return (int) Math.floor(Math.PI * radiusMax * radiusMax - Math.PI * radiusMin * radiusMin);
+            }
+
+            @Override
+            public int[] getCords() {
+                return asIntArray2w(
+                    getRandXyCircle(radiusMax, radiusMin, gaussianShrink, gaussianCenter)
+                );
+            }
         }
 
-        @Override
-        public int[] getCords() {
-            return asIntArray2w(
-                getRandXyCircle(radiusMax, radiusMin, gaussianShrink, gaussianCenter)
-            );
-        }
-    }
+        public static class Square extends Symmetric {
+            public Square(int rMax, int rMin) {super(rMax, rMin);}
 
-    public static class Square extends Symmetric {
-        public Square(int rMax, int rMin) {super(rMax, rMin);}
+            public Square(ConfigurationSection settings) {super(settings);}
 
-        public Square(ConfigurationSection settings) {super(settings);}
+            @Override
+            public String shape() {return "Square";}
 
-        @Override
-        public String shape() {return "Square";}
+            @Override
+            public int getArea() {
+                return 4 * (radiusMax * radiusMax - radiusMin * radiusMin);
+            }
 
-        @Override
-        public int getArea() {
-            return 4 * (radiusMax * radiusMax - radiusMin * radiusMin);
-        }
-
-        @Override
-        public int[] getCords() {
-            return asIntArray2w(
-                !gaussianDistribution
-                    ? getRandXySquare(radiusMax, radiusMin)
-                    : getRandXySquare(radiusMax, radiusMin, gaussianShrink, gaussianCenter)
-            );
+            @Override
+            public int[] getCords() {
+                return asIntArray2w(
+                    !gaussianDistribution
+                        ? getRandXySquare(radiusMax, radiusMin)
+                        : getRandXySquare(radiusMax, radiusMin, gaussianShrink, gaussianCenter)
+                );
+            }
         }
     }
 
@@ -154,7 +153,7 @@ abstract class DistributionShape {
 
         @Override
         public List<String> infoStrings(boolean mcFormat) {
-            ArrayList<String> list = new ArrayList<>();
+            List<String> list = new ArrayList<>();
             list.add(LVL_01_SET.format(mcFormat, "Distribution shape", shape()));
             list.add(DOU_01_SET.format(mcFormat, "X radius", xRadius, "Z radius", zRadius));
             if (gapEnabled) {
@@ -167,5 +166,4 @@ abstract class DistributionShape {
             return list;
         }
     }
-
 }
