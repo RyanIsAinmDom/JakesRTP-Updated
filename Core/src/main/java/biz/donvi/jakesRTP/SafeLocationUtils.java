@@ -45,29 +45,12 @@ public class SafeLocationUtils {
      * @return Whether it is safe or not to be there
      */
     boolean isSafeToBeIn(Material mat) {
-        switch (mat) {
-            case AIR:
-            case SNOW:
-            case FERN:
-            case LARGE_FERN:
-            case VINE:
-            case SHORT_GRASS:
-            case TALL_GRASS:
-            case GLOW_LICHEN:
-            case MOSS_CARPET:
-            case PALE_MOSS_CARPET:
-            case PINK_PETALS:
-            case WILDFLOWERS:
-            case LEAF_LITTER:
-                return true;
-            case WATER:
-            case LAVA:
-            case VOID_AIR:
-            case CAVE_AIR:
-            case POWDER_SNOW:
-            default:
-                return false;
-        }
+        return switch (mat) {
+            case AIR, SNOW, FERN, LARGE_FERN, VINE, SHORT_GRASS, TALL_GRASS,
+                 GLOW_LICHEN, MOSS_CARPET, PALE_MOSS_CARPET, PINK_PETALS,
+                 WILDFLOWERS, LEAF_LITTER -> true;
+            default -> false;
+        };
     }
 
     /**
@@ -77,32 +60,12 @@ public class SafeLocationUtils {
      * @return Whether it is safe or not to be there
      */
     boolean isSafeToBeOn(Material mat) {
-        switch (mat) {
-            case LAVA:
-            case MAGMA_BLOCK:
-            case WATER:
-            case AIR:
-            case CAVE_AIR:
-            case VOID_AIR:
-            case CACTUS:
-            case SEAGRASS:
-            case KELP:
-            case TALL_SEAGRASS:
-            case LILY_PAD:
-            case BAMBOO:
-            case BAMBOO_SAPLING:
-            case SMALL_DRIPLEAF:
-            case BIG_DRIPLEAF:
-            case BIG_DRIPLEAF_STEM:
-            case POINTED_DRIPSTONE:
-                return false;
-            case GRASS_BLOCK:
-            case DIRT:
-            case STONE:
-            case DEEPSLATE:
-            default:
-                return true;
-        }
+        return switch (mat) {
+            case LAVA, MAGMA_BLOCK, WATER, AIR, CAVE_AIR, VOID_AIR, CACTUS,
+                 SEAGRASS, KELP, TALL_SEAGRASS, LILY_PAD, BAMBOO, BAMBOO_SAPLING,
+                 SMALL_DRIPLEAF, BIG_DRIPLEAF, BIG_DRIPLEAF_STEM, POINTED_DRIPSTONE -> false;
+            default -> true;
+        };
     }
        
     /**
@@ -144,11 +107,8 @@ public class SafeLocationUtils {
      */
     boolean isInATree(final Location loc) {
         requireMainThread();
-        for (Material material : new Material[]{
-            loc.clone().add(0, 1, 0).getBlock().getType(),
-            loc.clone().add(0, 2, 0).getBlock().getType()})
-            if (isTreeLeaves(material)) return true;
-        return false;
+        return isTreeLeaves(loc.getBlock().getRelative(0, 1, 0).getType())
+            || isTreeLeaves(loc.getBlock().getRelative(0, 2, 0).getType());
     }
 
     /**
@@ -160,11 +120,11 @@ public class SafeLocationUtils {
      * @return True if the location is in a tree.
      */
     boolean isInTree(final Location loc, ChunkSnapshot chunk) {
-        for (Material material : new Material[]{
-            locMatFromSnapshot(loc.clone().add(0, 1, 0), chunk),
-            locMatFromSnapshot(loc.clone().add(0, 2, 0), chunk)})
-            if (isTreeLeaves(material)) return true;
-        return false;
+        int x = loc.getBlockX(), y = loc.getBlockY(), z = loc.getBlockZ();
+        int inX = x % 16; if (inX < 0) inX += 16;
+        int inZ = z % 16; if (inZ < 0) inZ += 16;
+        return isTreeLeaves(chunkLocMatFromSnapshot(inX, y + 1, inZ, chunk))
+            || isTreeLeaves(chunkLocMatFromSnapshot(inX, y + 2, inZ, chunk));
     }
 
     /* ================================================== *\
@@ -180,7 +140,8 @@ public class SafeLocationUtils {
      */
     void dropToGround(final Location loc) {
         requireMainThread();
-        while (isSafeToBeIn(loc.getBlock().getType()) || isSafeToGoThrough(loc.getBlock().getType()))
+        Material mat;
+        while (isSafeToBeIn(mat = loc.getBlock().getType()) || isSafeToGoThrough(mat))
             loc.add(0, -1, 0);
     }
 
@@ -193,30 +154,29 @@ public class SafeLocationUtils {
      * @param chunk The chunk snapshot that contains the {@code Location}'s data.
      */
     void dropToGround(final Location loc, ChunkSnapshot chunk) {
-        while (isSafeToBeIn(locMatFromSnapshot(loc, chunk)) || isSafeToGoThrough(locMatFromSnapshot(loc, chunk)))
+        Material mat;
+        while (isSafeToBeIn(mat = locMatFromSnapshot(loc, chunk)) || isSafeToGoThrough(mat))
             loc.add(0, -1, 0);
     }
 
     /**
      * Takes the given location, and moves it downwards until it is no longer inside something that is
      * considered safe to be in by {@code isSafeToBeIn()}<p>
-     * Note: This should only be run from the main thread.
+     * Note: This is no longer required to be run on the main thread // RyanIsAinmDom.
      *
      * @param loc      The location to modify
      * @param lowBound The lowest the location can go
      */
     void dropToGround(final Location loc, int lowBound, int highBound) {
-        requireMainThread();
         // If our location was above the max height, drop us to it.
         if (loc.getY() > highBound) loc.setY(highBound);
         // If we start in a solid block, we need to wait until we get out of it
-        Bukkit.getScheduler().runTask(JakesRtpPlugin.plugin, () -> {
-            loc.getChunk().load();
+        PaperLib.getChunkAtAsync(loc).thenAccept(chunk -> {
+            // chunk is now loaded, runs on main thread after async load
             while (loc.getBlockY() > lowBound && !(
                     isSafeToBeIn(loc.getBlock().getType())
                             || isSafeToGoThrough(loc.getBlock().getType()))
             ) loc.add(0, -1, 0);
-            // Now we are in something non-solid; we can start looking for the ground
             while (loc.getBlockY() > lowBound && (
                     isSafeToBeIn(loc.getBlock().getType())
                             || isSafeToGoThrough(loc.getBlock().getType()))
@@ -234,22 +194,19 @@ public class SafeLocationUtils {
      * @param chunk    The chunk snapshot that contains the {@code Location}'s data.
      */
     void dropToGround(final Location loc, int lowBound, int highBound, ChunkSnapshot chunk) {
-        // If our location was above the max height, drop us to it.
         if (loc.getY() > highBound) loc.setY(highBound);
-        // If we start in a solid block, we need to wait until we get out of it
+        Material mat;
         while (loc.getBlockY() > lowBound && !(
-            isSafeToBeIn(locMatFromSnapshot(loc, chunk))
-            || isSafeToGoThrough(locMatFromSnapshot(loc, chunk)))
+            isSafeToBeIn(mat = locMatFromSnapshot(loc, chunk)) || isSafeToGoThrough(mat))
         ) loc.add(0, -1, 0);
-        // Now we are in something non-solid; we can start looking for the ground
         while (loc.getBlockY() > lowBound && (
-            isSafeToBeIn(locMatFromSnapshot(loc, chunk))
-            || isSafeToGoThrough(locMatFromSnapshot(loc, chunk)))
+            isSafeToBeIn(mat = locMatFromSnapshot(loc, chunk)) || isSafeToGoThrough(mat))
         ) loc.add(0, -1, 0);
     }
 
     void dropToMiddle(final Location loc, int lowBound, int highBound) {
-        dropToMiddle(loc, lowBound, highBound, null);
+        PaperLib.getChunkAtAsync(loc).thenAccept(chunk ->
+            dropToMiddle(loc, lowBound, highBound, null));
     }
 
     void dropToMiddle(final Location loc, int lowBound, int highBound, ChunkSnapshot chunk) {
@@ -278,7 +235,7 @@ public class SafeLocationUtils {
             if (direction == 1)
                 upWasSolid = isSafeToBeOn(mat);
             else
-                downWasAir = isSafeToBeIn(mat) | isSafeToGoThrough(mat);
+                downWasAir = isSafeToBeIn(mat) || isSafeToGoThrough(mat);
             //Moving location
             loc.add(0, change * direction, 0);
             if (direction == -1)
@@ -310,11 +267,11 @@ public class SafeLocationUtils {
     }
 
     boolean isLocationInsideChunk(Location loc, ChunkSnapshot chunk) {
-        return (int) Math.floor((double) loc.getBlockX() / 16) == chunk.getX() &&
-               (int) Math.floor((double) loc.getBlockZ() / 16) == chunk.getZ();
+        return Math.floorDiv(loc.getBlockX(), 16) == chunk.getX() &&
+               Math.floorDiv(loc.getBlockZ(), 16) == chunk.getZ();
     }
 
-    static int chunkXZ(double blockXZ) { return (int) Math.floor((double) blockXZ / 16); }
+    static int chunkXZ(double blockXZ) { return (int) Math.floor(blockXZ / 16); }
 
     /* ================================================== *\
                 Misc (but still related) utils
