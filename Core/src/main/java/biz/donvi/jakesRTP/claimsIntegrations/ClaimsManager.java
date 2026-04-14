@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Arrays;
 
 public class ClaimsManager {
     protected final Plugin               ownerPlugin;
@@ -40,10 +41,9 @@ public class ClaimsManager {
     }
 
     public List<String> enabledLocationRestrictors() {
-        List<String> names = new ArrayList<>();
-        for (LocationRestrictor restrictor : locationRestrictors)
-            names.add(restrictor.supporterPlugin().getName());
-        return names;
+        return Arrays.stream(locationRestrictors)
+            .map(r -> r.supporterPlugin().getName())
+            .toList();
     }
 
     public boolean isInside(Location loc) {
