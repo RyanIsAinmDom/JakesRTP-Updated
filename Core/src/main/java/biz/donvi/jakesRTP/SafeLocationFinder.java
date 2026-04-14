@@ -148,17 +148,17 @@ public abstract class SafeLocationFinder {
      * @param checkProfile The profile setting. This determines which method will be called.
      */
     private void moveToStart(LocCheckProfiles checkProfile) throws PluginDisabledException, TimeoutException {
-        if (checkProfile == LocCheckProfiles.TOP_DOWN)
-            dropToGround();
-        else if (checkProfile == LocCheckProfiles.MIDDLE_OUT)
-            dropToMiddle();
-        else {
-            assert checkProfile == LocCheckProfiles.AUTO;
-            World world = loc.getWorld();
-            if (world != null && world.getEnvironment() == World.Environment.NETHER) {
-                if (highBound > 127) highBound = 127;
-                dropToMiddle();
-            } else dropToGround();
+        switch (checkProfile) {
+            case TOP_DOWN -> dropToGround();
+            case MIDDLE_OUT -> dropToMiddle();
+            default -> {
+                assert checkProfile == LocCheckProfiles.AUTO;
+                World world = loc.getWorld();
+                if (world != null && world.getEnvironment() == World.Environment.NETHER) {
+                    if (highBound > 127) highBound = 127;
+                    dropToMiddle();
+                } else dropToGround();
+            }
         }
     }
 
