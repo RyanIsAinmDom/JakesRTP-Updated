@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.List;
 
 import static biz.donvi.jakesRTP.claimsIntegrations.LrWorldGuard.registerWorldGuardFlag;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -202,7 +203,7 @@ public final class JakesRtpPlugin extends JavaPlugin {
             }
         else
             try {
-                ArrayList<String> langSettingsHeader = new ArrayList<>();
+                List<String> langSettingsHeader = new ArrayList<>();
 
                 // All file related variables
                 InputStream defaultLangSettings = getClassLoader().getResourceAsStream(LANG_SETTINGS_FILE_NAME);
@@ -291,15 +292,7 @@ public final class JakesRtpPlugin extends JavaPlugin {
     //<editor-fold desc="Logging Related">
     private static final Queue<LogMsg> msgLog = new ArrayDeque<>();
 
-    private static final class LogMsg {
-        final Level  left;
-        final String right;
-
-        LogMsg(Level level, String msg) {
-            left = level;
-            right = msg;
-        }
-    }
+    private record LogMsg(Level left, String right) {}
 
     public static void log(Level level, String msg) {
         msgLog.add(new LogMsg(level, msg));
