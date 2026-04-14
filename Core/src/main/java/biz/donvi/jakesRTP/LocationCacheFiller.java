@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 
 import java.lang.ref.WeakReference;
 import java.util.logging.Level;
+import java.util.List;
 
 import static biz.donvi.jakesRTP.JakesRtpPlugin.infoLog;
 import static biz.donvi.jakesRTP.JakesRtpPlugin.log;
@@ -41,7 +42,7 @@ public class LocationCacheFiller implements Runnable {
                             pluginMain().getRandomTeleporter().fillQueue(settings);
                         } catch (JrtpBaseException ex) {
                             issueCounter += 2;
-                            if (ex instanceof JrtpBaseException.PluginDisabledException) throw ex;
+                            if (ex instanceof JrtpBaseException.PluginDisabledException pde) throw pde;
                             if (ex instanceof JrtpBaseException.NotPermittedException)
                                 infoLog(
                                     "An exception has occurred that should be impossible to occur. Please report this" +
@@ -88,9 +89,8 @@ public class LocationCacheFiller implements Runnable {
      *
      * @return An array of the current {@code RtpSettings} for the plugin.
      */
-    private RtpProfile[] getCurrentRtpSettings() {
-        //noinspection ConstantConditions
-        return pluginReference.get().getRandomTeleporter().getRtpSettings().toArray(new RtpProfile[0]);
+    private List<RtpProfile> getCurrentRtpSettings() {
+        return pluginReference.get().getRandomTeleporter().getRtpSettings();
     }
 
     /**
