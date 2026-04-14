@@ -363,7 +363,6 @@ public class RandomTeleporter {
         if (queueEnabled && takeFromQueue && rtpProfile.canUseLocQueue) {
             Location preselectedLocation = rtpProfile.locationQueue.poll();
             if (preselectedLocation != null) {
-                PaperLib.getChunkAtAsync(preselectedLocation);
                 plugin.getServer().getScheduler() // Tell queue to refill soon
                       .runTaskLater(plugin, () -> locFinderRunnable.syncNotify(), 100);
                 return preselectedLocation;
