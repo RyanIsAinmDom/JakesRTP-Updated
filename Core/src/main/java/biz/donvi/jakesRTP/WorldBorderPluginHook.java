@@ -2,13 +2,10 @@ package biz.donvi.jakesRTP;
 
 import org.bukkit.*;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.popcraft.chunky.shape.Shape;
 import org.popcraft.chunkyborder.BorderData;
 import org.popcraft.chunkyborder.ChunkyBorder;
-import org.popcraft.chunkyborder.ChunkyBorderBukkit;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
