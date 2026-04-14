@@ -121,7 +121,7 @@ public class RtpProfile {
                 if (!tempCallFromWorlds.contains(testByWorld) &&
                     Pattern.compile(callFromWorld).matcher(testByWorld.getName()).matches()
                 ) tempCallFromWorlds.add(testByWorld);
-        if (tempCallFromWorlds.size() == 0)
+        if (tempCallFromWorlds.isEmpty())
             if (defaults.callFromWorlds != null) tempCallFromWorlds.addAll(defaults.callFromWorlds);
             else tempCallFromWorlds.add(landingWorld);
         callFromWorlds = Collections.unmodifiableList(tempCallFromWorlds);
@@ -141,7 +141,7 @@ public class RtpProfile {
             for (String s : distributions.keySet()) strb.append(" ").append(s);
             throw new JrtpBaseException(
                 "Distribution not found. Distribution given: '" + config.getString("distribution") +
-                "', distributions available:" + strb.toString());
+                "', distributions available:" + strb);
         }
         for (String s : distribution.shape.infoStrings(false)) infoLog(nameInLog + s);
         infoLog(nameInLog + infoStringRegionCenter(false)); // double log!
@@ -184,8 +184,8 @@ public class RtpProfile {
         checkProfile = config.getString("location-checking-profile", null) == null
             ? defaults.checkProfile
             : LocCheckProfiles.values()[config.getString("location-checking-profile").toLowerCase().charAt(0) - 'a'];
-        infoLog( nameInLog + infoStringLocationCheckProfile(false));
-        commandsToRun = config.getStringList("then-execute").size() == 0
+        infoLog(nameInLog + infoStringLocationCheckProfile(false));
+        commandsToRun = config.getStringList("then-execute").isEmpty()
             ? defaults.commandsToRun
             : config.getStringList("then-execute").toArray(new String[0]);
         canUseLocQueue = distribution.center != DistributionSettings.CenterTypes.PLAYER_LOCATION &&
@@ -246,7 +246,7 @@ public class RtpProfile {
 
     public List<String> infoStringAll(boolean mcFormat, boolean full) {
         String name = "[" + this.name + "] ";
-        ArrayList<String> lines = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
         if (mcFormat) {
             lines.add(HEADER_TOP.format(true));
             lines.add(HEADER_MID.format(true, "RtpSettings for " + name));
@@ -279,23 +279,20 @@ public class RtpProfile {
 
 
     public String getRtpRegionCenterAsString(final boolean mcFormat) {
-        switch (distribution.center) {
-            case WORLD_SPAWN:
-                return MessageFormat.format(
-                    "World Spawn {0}({1}, {2}){0}",
-                    mcFormat ? "\u00A7o" : "",
-                    (int) landingWorld.getSpawnLocation().getX(),
-                    (int) landingWorld.getSpawnLocation().getZ());
-            case PRESET_VALUE:
-                return MessageFormat.format(
-                    "Specified in Config {0}({1}, {2}){0}",
-                    mcFormat ? "\u00A7o" : "",
-                    distribution.centerX,
-                    distribution.centerZ);
-            case PLAYER_LOCATION:
-                return "Player's Location";
-        }
-        return "??";
+        return switch (distribution.center) {
+            case WORLD_SPAWN -> MessageFormat.format(
+                "World Spawn {0}({1}, {2}){0}",
+                mcFormat ? "\u00A7o" : "",
+                (int) landingWorld.getSpawnLocation().getX(),
+                (int) landingWorld.getSpawnLocation().getZ());
+            case PRESET_VALUE -> MessageFormat.format(
+                "Specified in Config {0}({1}, {2}){0}",
+                mcFormat ? "\u00A7o" : "",
+                distribution.centerX,
+                distribution.centerZ);
+            case PLAYER_LOCATION -> "Player's Location";
+            default -> "??";
+        };
     }
 
     public String getQueueSizesAsString() {
@@ -325,7 +322,7 @@ public class RtpProfile {
     }
 
     public List<String> infoStringsCallFromWorlds(boolean mcFormat) {
-        ArrayList<String> lines = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
         lines.add(LVL_01_SET.format(mcFormat, "Call from worlds", ""));
         for (int i = 0; i < callFromWorlds.size(); i++) {
             lines.add(LVL_02_SET.format(mcFormat, i, callFromWorlds.get(i).getName()));
@@ -344,7 +341,7 @@ public class RtpProfile {
     }
 
     public List<String> infoStringsWarmup(boolean mcFormat) {
-        ArrayList<String> lines = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
         if (warmupEnabled) {
             lines.add(DOU_01_SET.format(mcFormat, "Warmup", "Enabled", "Seconds", warmup));
             lines.add(LVL_02_SET.format(mcFormat, "Cancel warmup on player move",
