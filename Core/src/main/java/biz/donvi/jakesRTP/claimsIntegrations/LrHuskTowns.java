@@ -24,3 +24,4 @@ public class LrHuskTowns implements LocationRestrictor {
         Position position = api.getPosition(location);
         return api.isClaimAt(position).isPresent();
     }
+}
