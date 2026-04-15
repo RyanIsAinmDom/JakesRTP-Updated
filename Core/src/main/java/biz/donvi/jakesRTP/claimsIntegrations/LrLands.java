@@ -20,7 +20,6 @@ public class LrLands implements LocationRestrictor {
 
     @Override
     public boolean denyLandingAtLocation(Location location) {
-        // isClaimed(...) is deprecated/removed on the new API; check for an Area instead
-        return api.getUnloadedArea(location) != null;
+        return api.getArea(location) != null;
     }
 }
