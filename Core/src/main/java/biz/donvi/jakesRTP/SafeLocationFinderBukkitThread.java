@@ -22,7 +22,7 @@ public class SafeLocationFinderBukkitThread extends SafeLocationFinder {
         if (!loc.getChunk().isLoaded()) {
             JakesRtpPlugin.log(Level.WARNING,
                 "[JRTP] Synchronous chunk load triggered in SafeLocationFinderBukkitThread. " + //This happens when a chunk refuses to be loaded asyncronously. At this point, the chunk must be loaded by any means necessary.
-                "This may cause a server stutter. If this warning is frequent, please report it.");
+                "This may cause a server stutter. If this warning is frequent, please report it."); //On spigot, chunks are never loaded asyncronously; however, for us to have gotten here, the load is taking too long.
             loc.getChunk().load(); //Sync chunk load; this is a fallback method and should only be needed in extremely rare scenarios (if ever). Otherwise, chunk loading is always async.
         }
         return loc.getBlock().getType();
