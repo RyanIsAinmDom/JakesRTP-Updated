@@ -20,8 +20,8 @@ public class LrHuskTowns implements LocationRestrictor {
 
     @Override
     public boolean denyLandingAtLocation(Location location) {
-        BukkitHuskTownsAPI api = BukkitHuskTownsAPI.getBukkitInstance();
+        BukkitHuskTownsAPI api = BukkitHuskTownsAPI.getInstance();
         Position position = api.getPosition(location);
-        return api.isClaimAt(position).isPresent();
+        return api.isClaimAt(position);
     }
 }
