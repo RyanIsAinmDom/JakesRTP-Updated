@@ -1,6 +1,5 @@
 package biz.donvi.jakesRTP.claimsIntegrations;
 
-import net.william278.husktowns.api.HuskTownsAPI;
 import net.william278.husktowns.api.BukkitHuskTownsAPI;
 import net.william278.husktowns.claim.Position;
 import org.bukkit.Location;
@@ -21,8 +20,7 @@ public class LrHuskTowns implements LocationRestrictor {
 
     @Override
     public boolean denyLandingAtLocation(Location location) {
-        // Convert Bukkit Location to HuskTowns Position and check if it's claimed (not wilderness)
-        Position position = BukkitHuskTownsAPI.getInstance().getPosition(location);
-        return position != null && HuskTownsAPI.getInstance().isClaimAt(position);
+        BukkitHuskTownsAPI api = BukkitHuskTownsAPI.getBukkitInstance();
+        Position position = api.getPosition(location);
+        return api.isClaimAt(position).isPresent();
     }
-}
